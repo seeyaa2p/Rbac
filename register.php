@@ -1,9 +1,12 @@
 <?php
+session_start();
+
 $username = $_POST['username'];
 $password = $_POST['password'];
 $name = $_POST['name'];
+$m_level = $_POST['m_level'];
 
-if (!empty($username) && !empty($password) && !empty($name)) {
+if (!empty($username) && !empty($password) && !empty($name) && !empty($m_level)) {
  $host = "localhost";
     $dbUsername = "root";
     $dbPassword = "";
@@ -14,7 +17,7 @@ if (!empty($username) && !empty($password) && !empty($name)) {
      die('Connect Error('. mysqli_connect_errno().')'. mysqli_connect_error());
     } else {
      $SELECT = "SELECT username FROM user WHERE username = ? LIMIT 1";
-     $INSERT = "INSERT INTO user (username, password, name) VALUES (?, ?, ?)";
+     $INSERT = "INSERT INTO user (username, password, name, m_level) VALUES (?, ?, ?, ?)";
      //Prepare statement
      $stmt = $conn->prepare($SELECT);
      $stmt->bind_param("s", $username);
@@ -25,7 +28,7 @@ if (!empty($username) && !empty($password) && !empty($name)) {
       $stmt->close();
       $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
       $stmt = $conn->prepare($INSERT);
-      $stmt->bind_param("sss", $username, $hashedPassword, $name);
+      $stmt->bind_param("ssss", $username, $hashedPassword, $name, $m_level);
       $stmt->execute();
       echo "บันทึกข้อมูลเรียบร้อย";
      } else {
