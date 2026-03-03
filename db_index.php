@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 session_start();
 $open_connect = 1;
 require('db_connect.php');
@@ -13,25 +13,7 @@ if(!isset($_SESSION['id_account']) || !isset($_SESSION['role_account'])){//ถ�
     $query_show = "SELECT * FROM account WHERE id_account = '$id_account'";
     $call_back_show = mysqli_query($connect, $query_show);
     $result_show = mysqli_fetch_assoc($call_back_show);
-    
+  
 }
 
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta http-equiv=Content-Type content="text/html; charset=utf-8">
-    <title>index</title>
-</head>
-<body>
-    <form action="index.php" method="POST">
-    <table>
-    <center>
-        <h1>ยินดีต้อนรับคุณ <?php echo $result_show['username_account']; ?> ในฐานะ <?php echo $result_show['role_account']; ?></h1>
-        <h2><a href="index.php?logout=1">ออกจากระบบ</a></h2>
-    </center>
-    </table>
-</body>
-</html>
-
+?> -->

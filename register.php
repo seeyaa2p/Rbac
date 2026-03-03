@@ -1,44 +1,52 @@
 <?php
-session_start();
-
-$username = $_POST['username'];
-$password = $_POST['password'];
-$name = $_POST['name'];
-$m_level = $_POST['m_level'];
-
-if (!empty($username) && !empty($password) && !empty($name) && !empty($m_level)) {
- $host = "localhost";
-    $dbUsername = "root";
-    $dbPassword = "";
-    $dbname = "website";
-    //create connection
-    $conn = new mysqli($host, $dbUsername, $dbPassword, $dbname);
-    if (mysqli_connect_error()) {
-     die('Connect Error('. mysqli_connect_errno().')'. mysqli_connect_error());
-    } else {
-     $SELECT = "SELECT username FROM user WHERE username = ? LIMIT 1";
-     $INSERT = "INSERT INTO user (username, password, name, m_level) VALUES (?, ?, ?, ?)";
-     //Prepare statement
-     $stmt = $conn->prepare($SELECT);
-     $stmt->bind_param("s", $username);
-     $stmt->execute();
-     $stmt->store_result();
-     $rnum = $stmt->num_rows;
-     if ($rnum==0) {
-      $stmt->close();
-      $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-      $stmt = $conn->prepare($INSERT);
-      $stmt->bind_param("ssss", $username, $hashedPassword, $name, $m_level);
-      $stmt->execute();
-      echo "บันทึกข้อมูลเรียบร้อย";
-     } else {
-      echo "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว!!";
-     }
-     $stmt->close();
-     $conn->close();
-    }
-} else {
- echo "All fields are required";
- die();
-}
+    session_start();
+    require('db_register.php'); 
 ?>
+
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Register</title>
+  <meta http-equiv=Content-Type content="text/html; charset=utf-8">
+</head>
+<body>
+ <form action="register.php" method="POST">
+  <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <div style="text-align: center;">
+      <h1>Register</h1>
+      <table style="margin: 0 auto; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 10px;">ชื่อผู้ใช้ :</td>
+          <td style="padding: 10px;"><input type="text" name="username" required></td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;">รหัสผ่าน :</td>
+          <td style="padding: 10px;"><input type="password" name="password" required></td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;">ชื่อ สกุล:</td>
+          <td style="padding: 10px;"><input type="text" name="name" required></td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;">ระดับผู้ใช้ :</td>
+          <td>
+            <select name="m_level" id="choices" style="padding: 10px" required>
+              <option value="">--Please choose an option--</option>
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          </td>
+          <!-- <td style="padding: 10px;"><input type="text" name="m_level" required></td> -->
+        </tr>
+        <tr>
+          <td colspan="2" style="padding: 10px; text-align: center;"><input type="submit" value="Submit"></td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding: 10px; text-align: center;"><input type="button" value="Login" onclick="window.location.href='login.php'"></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+ </form>
+</body>
+</html>
