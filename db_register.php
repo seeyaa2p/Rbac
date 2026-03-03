@@ -6,7 +6,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
     $name = $_POST['name'];
-    $m_level = $_POST['m_level'];
 
     if (!empty($username) && !empty($password) && !empty($name) && !empty($m_level)) {
         $SELECT = "SELECT username FROM user WHERE username = ? LIMIT 1";
@@ -21,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->close();
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $conn->prepare($INSERT);
-            $stmt->bind_param("ssss", $username, $hashedPassword, $name, $m_level);
+            $stmt->bind_param("ssss", $username, $hashedPassword, $name);
             if ($stmt->execute()) {
                 // สมัครเสร็จแล้วแจ้งเตือนและเด้งไปหน้า Login
                 echo "<script>alert('บันทึกข้อมูลเรียบร้อย'); window.location.href='login.php';</script>";
