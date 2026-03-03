@@ -28,17 +28,6 @@
           <td style="padding: 10px;"><input type="text" name="name" required></td>
         </tr>
         <tr>
-          <td style="padding: 10px;">ระดับผู้ใช้ :</td>
-          <td>
-            <select name="m_level" id="choices" style="padding: 10px" required>
-              <option value="">--Please choose an option--</option>
-              <option value="admin">Admin</option>
-              <option value="user">User</option>
-            </select>
-          </td>
-          <!-- <td style="padding: 10px;"><input type="text" name="m_level" required></td> -->
-        </tr>
-        <tr>
           <td colspan="2" style="padding: 10px; text-align: center;"><input type="submit" value="Submit"></td>
         </tr>
         <tr>

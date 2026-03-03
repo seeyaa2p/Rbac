@@ -1,47 +1,31 @@
 <?php
-$conn = 1;
 require('db_connect.php');
 
-if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
-  $username = isset($_POST['username']) ? $_POST['username'] : '';
-  $password = isset($_POST['password']) ? $_POST['password'] : '';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-  // ค้นหาผู้ใช้ในฐานข้อมูล (ใช้ Prepared Statement)
-  $sql = "SELECT username, password FROM user WHERE username = ?";
-  $stmt = $conn->prepare($sql);
-  
-  if (!$stmt) {
-    die("Prepare failed: " . $conn->error);
-  }
-  
-  $stmt->bind_param("s", $username);
-  $stmt->execute();
-  $result = $stmt->get_result();
-  
-  if ($result->num_rows > 0) {
-    // ผู้ใช้พบในฐานข้อมูล
-    $row = $result->fetch_assoc();
-    $hashed_password = $row['password'];
+    // หมายเหตุ: เช็คในฐานข้อมูลด้วยนะครับว่าคอลัมน์ ID ของคุณชื่อ id_account หรือ id เฉยๆ
+    $sql = "SELECT id_account, username, password, m_level FROM user WHERE username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-      // ตรวจสอบรหัสผ่าน
-      if (password_verify($password, $hashed_password)) {
-        // รหัสผ่านถูกต้อง
-        $_SESSION['username'] = $username;
+    if ($row = $result->fetch_assoc()) {
+        if (password_verify($password, $row['password'])) {
+            // เก็บค่าลง Session เพื่อยืนยันตัวตน
+            $_SESSION['id_account'] = $row['id_account'];
+            $_SESSION['role_account'] = $row['m_level']; 
+            $_SESSION['username'] = $row['username'];
 
-        ob_end_clean();
-        header("Location: index.php");
-        exit();
+            header("Location: index.php");
+            exit();
+        } else {
+            echo "<p style='color:red; text-align:center;'>รหัสผ่านไม่ถูกต้อง</p>";
+        }
     } else {
-      // รหัสผ่านไม่ถูกต้อง
-      echo "Invalid password.";
+        echo "<p style='color:red; text-align:center;'>ไม่พบชื่อผู้ใช้นี้</p>";
     }
-  } else {
-    // ไม่พบผู้ใช้ในฐานข้อมูล
-    echo "No user found with that username.";
-  }
-
-  $stmt->close();
-  $conn->close();
-
 }
 ?>
