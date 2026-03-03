@@ -1,6 +1,6 @@
 <?php
 session_start();
-$open_connect = 1;
+$conn = 1;
 require('db_connect.php');
 
 if(!isset($_SESSION['id_account']) || $_SESSION['role_account'] != 'admin'){//ถ้าไม่มีเซสชัน id_account หรือเซสชัน role_account จะถูกส่งไปหน้า login
