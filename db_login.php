@@ -5,7 +5,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // ดึงข้อมูลคอลัมน์ user_id ตามรูปในฐานข้อมูล
+    // ดึงข้อมูลจากฐานข้อมูล
     $sql = "SELECT user_id, username, password, m_level FROM user WHERE username = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
@@ -14,12 +14,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($row = $result->fetch_assoc()) {
         if (password_verify($password, $row['password'])) {
-            // เก็บ Session ในชื่อ user_id ให้ตรงกับฐานข้อมูล
+            // เก็บ Session 
             $_SESSION['user_id'] = $row['user_id']; 
             $_SESSION['role_account'] = $row['m_level']; 
             $_SESSION['username'] = $row['username'];
 
-            header("Location: index.php");
+            //  ตรวจสอบสิทธิ์เพื่อแยกหน้า Landing Page
+            if ($row['m_level'] === 'admin') {
+                header("Location: admin.php"); // ถ้าเป็น admin ให้พาไปหน้าจัดการหลังบ้าน
+            } else {
+                header("Location: index.php"); // ถ้าเป็นสิทธิ์อื่นๆ (user) ให้พาไปหน้าแรกปกติ
+            }
             exit();
         } else {
             echo "<script>alert('รหัสผ่านไม่ถูกต้อง'); window.history.back();</script>";
