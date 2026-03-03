@@ -1,15 +1,19 @@
 <?php
 require('db_connect.php');
 
-// เช็คว่ามีการกดปุ่ม Submit ส่งค่าแบบ POST มาหรือยัง
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $name = $_POST['name'];
+    // 1. รับค่าจากฟอร์มและใช้ trim() เพื่อป้องกันการเผลอกดเว้นวรรค
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
+    $name = trim($_POST['name']);
+    
+    // 2. กำหนดสิทธิ์เริ่มต้นให้เป็น 'user' เสมอ
+    $m_level = 'user'; 
 
-    if (!empty($username) && !empty($password) && !empty($name) && !empty($m_level)) {
+    // 3. เช็คเฉพาะ 3 ช่องที่รับมาจากฟอร์มว่าต้องไม่เป็นค่าว่าง
+    if (!empty($username) && !empty($password) && !empty($name)) { 
         $SELECT = "SELECT username FROM user WHERE username = ? LIMIT 1";
-        $INSERT = "INSERT INTO user (username, password, name) VALUES (?, ?, ?)";
+        $INSERT = "INSERT INTO user (username, password, name, m_level) VALUES (?, ?, ?, ?)";
         
         $stmt = $conn->prepare($SELECT);
         $stmt->bind_param("s", $username);
@@ -18,19 +22,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         if ($stmt->num_rows == 0) {
             $stmt->close();
+            // เข้ารหัสผ่านก่อนบันทึก
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $conn->prepare($INSERT);
-            $stmt->bind_param("ssss", $username, $hashedPassword, $name);
+            
+            // ส่งค่าทั้ง 4 ตัวแปร (รวมถึง $m_level ที่ตั้งเป็น 'user') ลงฐานข้อมูล
+            $stmt->bind_param("ssss", $username, $hashedPassword, $name, $m_level);
             if ($stmt->execute()) {
-                // สมัครเสร็จแล้วแจ้งเตือนและเด้งไปหน้า Login
-                echo "<script>alert('บันทึกข้อมูลเรียบร้อย'); window.location.href='login.php';</script>";
+                echo "<script>alert('สมัครสมาชิกเรียบร้อยแล้ว!'); window.location.href='login.php';</script>";
+            } else {
+                echo "<script>alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล'); window.history.back();</script>";
             }
         } else {
-            echo "<p style='color:red; text-align:center;'>ชื่อผู้ใช้นี้ถูกใช้งานแล้ว!!</p>";
+            echo "<script>alert('ชื่อผู้ใช้นี้ถูกใช้งานแล้ว!!'); window.history.back();</script>";
         }
         $stmt->close();
     } else {
-        echo "<p style='color:red; text-align:center;'>กรุณากรอกข้อมูลให้ครบถ้วน</p>";
+        echo "<script>alert('กรุณากรอกข้อมูลให้ครบถ้วน'); window.history.back();</script>";
     }
 }
 ?>

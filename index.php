@@ -2,21 +2,23 @@
 session_start();
 require('db_connect.php');
 
-// ถ้าไม่มี Session ให้กลับไปหน้า Login
-if(!isset($_SESSION['id_account'])){
+// เช็คว่ามี Session user_id หรือไม่
+if(!isset($_SESSION['user_id'])){
     header('Location: login.php');
     exit();
 }
 
-// ถ้ามีการกดออกจากระบบ
 if(isset($_GET['logout'])){ 
     session_destroy();
     header('Location: login.php');
     exit();
 }
 
-$id_account = $_SESSION['id_account'];
-$query_show = "SELECT * FROM user WHERE id_account = '$id_account'";
+// รับค่าจาก Session
+$user_id = $_SESSION['user_id'];
+
+// ค้นหาโดยใช้ WHERE user_id
+$query_show = "SELECT * FROM user WHERE user_id = '$user_id'";
 $call_back_show = mysqli_query($conn, $query_show);
 $result_show = mysqli_fetch_assoc($call_back_show);
 ?>

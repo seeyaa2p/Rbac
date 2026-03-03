@@ -1,34 +1,64 @@
 <?php
 session_start();
-$conn = 1;
 require('db_connect.php');
 
-if(!isset($_SESSION['id_account']) || $_SESSION['role_account'] != 'admin'){//ถ้าไม่มีเซสชัน id_account หรือเซสชัน role_account จะถูกส่งไปหน้า login
-    die(header('Location: login.php'));
-}elseif(isset($_GET['logout'])){ //ถ้ามีการกดปุ่มออกจากระบบให้ทำการทำลายเซสชันและส่งไปหน้า login
-    session_destroy();
-    die(header('Location: login.php'));
-}else{
-    $id_account = $_SESSION['id_account'];
-    $query_show = "SELECT * FROM user WHERE username = '$id_account'";
-    $call_back_show = mysqli_query($connect, $query_show);
-    $result_show = mysqli_fetch_assoc($call_back_show);
-
+// ตรวจสอบสิทธิ์: ต้องล็อกอิน และต้องมีระดับเป็น 'admin' เท่านั้น 🛡️
+if (!isset($_SESSION['user_id']) || $_SESSION['role_account'] !== 'admin') {
+    echo "<script>alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้'); window.location.href='index.php';</script>";
+    exit();
 }
 
+// ดึงข้อมูลประวัติทั้งหมด เรียงจากล่าสุดไปเก่าสุด
+$sql = "SELECT * FROM audit_logs ORDER BY timestamp DESC"; 
+$result = mysqli_query($conn, $sql);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="utf-8">
+    <title>Admin Dashboard - Audit Logs</title>
+    <style>
+        body { font-family: sans-serif; }
+        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background-color: #f4f4f4; }
+        .btn-container { text-align: center; margin-bottom: 20px; }
+        .btn { padding: 10px 15px; color: white; text-decoration: none; border-radius: 5px; margin: 0 5px; }
+        .btn-logout { background-color: #ff4d4d; }
+        .btn-export { background-color: #4CAF50; }
+    </style>
 </head>
 <body>
-    <center>
-    <h1>ยินดีต้อนรับคุณ <?php echo $result_show['username_account']; ?> ในฐานะ <?php echo $result_show['role_account']; ?></h1>
-    <h2><a href="index.php?logout=1">ออกจากระบบ</a></h2>
-    </center>
+    <h1 style="text-align: center;">ระบบจัดการหลังบ้าน (Audit Logs)</h1>
+    
+    <div class="btn-container">
+        <a href="index.php?logout=1" class="btn btn-logout">🚪 ออกจากระบบ</a>
+        <a href="export_logs.php" class="btn btn-export">📥 Export to JSON</a>
+    </div>
+
+    <table>
+        <tr>
+            <th>Log ID</th>
+            <th>User ID</th>
+            <th>รายละเอียด (Action)</th>
+            <th>เวลา (Timestamp)</th>
+        </tr>
+        
+        <?php
+        if (mysqli_num_rows($result) > 0) {
+            while($row = mysqli_fetch_assoc($result)) {
+                echo "<tr>";
+                echo "<td>" . $row['log_id'] . "</td>"; 
+                echo "<td>" . $row['user_id'] . "</td>";
+                echo "<td>" . $row['action'] . "</td>";
+                echo "<td>" . $row['timestamp'] . "</td>";
+                echo "</tr>";
+            }
+        } else {
+            echo "<tr><td colspan='4'>ยังไม่มีข้อมูลประวัติการใช้งาน</td></tr>";
+        }
+        ?>
+    </table>
 </body>
 </html>
