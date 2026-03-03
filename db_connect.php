@@ -6,10 +6,10 @@
     $dbname = "db.secOps";
 
     // Create Connection
-    $conn = mysqli_connect($servername, $username, $password, $dbname);
+    $open_connect = mysqli_connect($servername, $username, $password, $dbname);
 
     // Check connection
-    if (!$conn) {
+    if (!$open_connect) {
         die("Connection failed" . mysqli_connect_error());
     } 
 

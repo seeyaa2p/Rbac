@@ -10,7 +10,7 @@ if(!isset($_SESSION['id_account']) || $_SESSION['role_account'] != 'admin'){//à¸
     die(header('Location: login.php'));
 }else{
     $id_account = $_SESSION['id_account'];
-    $query_show = "SELECT * FROM account WHERE id_account = '$id_account'";
+    $query_show = "SELECT * FROM user WHERE username = '$id_account'";
     $call_back_show = mysqli_query($connect, $query_show);
     $result_show = mysqli_fetch_assoc($call_back_show);
 
