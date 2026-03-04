@@ -2,7 +2,7 @@
 session_start();
 require('db_connect.php');
 
-// ตรวจสอบสิทธิ์: ต้องล็อกอิน และต้องมีระดับเป็น 'admin' เท่านั้น 🛡️
+// ตรวจสอบสิทธิ์: ต้องล็อกอิน และต้องมีระดับเป็น 'admin' เท่านั้น 
 if (!isset($_SESSION['user_id']) || $_SESSION['role_account'] !== 'admin') {
     echo "<script>alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้'); window.location.href='index.php';</script>";
     exit();
@@ -33,8 +33,8 @@ $result = mysqli_query($conn, $sql);
     <h1 style="text-align: center;">ระบบจัดการหลังบ้าน (Audit Logs)</h1>
     
     <div class="btn-container">
-        <a href="index.php?logout=1" class="btn btn-logout">🚪 ออกจากระบบ</a>
-        <a href="export_logs.php" class="btn btn-export">📥 Export to JSON</a>
+        <a href="index.php?logout=1" class="btn btn-logout"> ออกจากระบบ</a>
+        <a href="export_logs.php" class="btn btn-export"> Export to JSON</a>
     </div>
 
     <table>
