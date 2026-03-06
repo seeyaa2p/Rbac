@@ -2,9 +2,16 @@
 session_start();
 require('db_connect.php');
 
-// เช็คว่ามี Session user_id หรือไม่
+// 1. เช็คว่าล็อกอินเข้ามาหรือยัง (มี Session user_id หรือไม่)
 if(!isset($_SESSION['user_id'])){
     header('Location: login.php');
+    exit();
+}
+
+// 2. เช็คสิทธิ์ว่าเป็น admin หรือไม่
+if($_SESSION['role_account'] !== 'admin'){
+    // ถ้าไม่ใช่ admin ให้เด้งกลับไปหน้าแรก
+    header('Location: index.php'); 
     exit();
 }
 
