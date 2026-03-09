@@ -2,8 +2,7 @@
 // 1. เชื่อมต่อฐานข้อมูล
 require_once 'db_connect.php';
 
-// 2. ดึงข้อมูล Log พร้อม JOIN เพื่อเอาชื่อ "ผู้กระทำ" และ "ผู้ถูกกระทำ"
-// u1 = ผู้กระทำ (admin), u2 = ผู้ถูกกระทำ (target)
+// 2. ดึงข้อมูล Log
 $sql = "SELECT a.*, 
                u1.username AS admin_name, 
                u2.username AS target_name 
@@ -18,57 +17,35 @@ if (!$result) {
     die("Query Error: " . $conn->error);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <title>ประวัติการใช้งานระบบ</title>
-    <style>
-        body { font-family: 'Tahoma', sans-serif; background-color: #f8f9fa; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 1100px; margin: auto; }
-        h2 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-bottom: 20px; }
-        
-        /* ปุ่มย้อนกลับด้านบน 🔝 */
-        .btn-back { 
-            display: inline-block; 
-            padding: 10px 20px; 
-            background-color: #6c757d; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 5px; 
-            margin-bottom: 20px; 
-            transition: 0.3s; 
-        }
-        .btn-back:hover { background-color: #5a6268; }
-
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
-        th { background-color: #007bff; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        
-        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; color: white; font-weight: bold; }
-        .UPDATE { background-color: #ffc107; color: #212529; }
-        .DELETE { background-color: #dc3545; }
-        .CREATE { background-color: #28a745; }
-    </style>
 </head>
-<body>
+<body bgcolor="#f8f9fa">
 
-<div class="container">
-    <h2> ประวัติการใช้งานระบบ </h2>
+<div align="center">
+    <h2><font color="#333333">ประวัติการใช้งานระบบ</font></h2>
 
-    <a href="admin.php" class="btn-back">⬅ ย้อนกลับไปหน้าหลักแอดมิน</a>
+    <table border="0" width="90%">
+        <tr>
+            <td align="left">
+                <a href="admin.php"><button><h3>ย้อนกลับไปหน้าหลักแอดมิน</h3></button></a>
+            </td>
+        </tr>
+    </table>
+    <br>
     
-    <table>
+    <table border="1" width="90%" cellpadding="10" cellspacing="0" bgcolor="#ffffff">
         <thead>
-            <tr>
-                <th>วัน-เวลา </th>
-                <th>ผู้กระทำ </th>
-                <th>ประเภท </th>
-                <th>รายละเอียด </th>
-                <th>ผู้ถูกกระทำ (Target) </th>
-                <th>IP Address </th>
+            <tr bgcolor="#007bff">
+                <th width="15%"><font color="#ffffff">วัน-เวลา</font></th>
+                <th width="15%"><font color="#ffffff">ผู้กระทำ</font></th>
+                <th width="15%"><font color="#ffffff">ประเภท</font></th>
+                <th width="15%"><font color="#ffffff">รายละเอียด</font></th>
+                <th width="15%"><font color="#ffffff">Target</font></th>
+                <th width="15%"><font color="#ffffff">IP Address</font></th>
             </tr>
         </thead>
         <tbody>
@@ -76,16 +53,18 @@ if (!$result) {
                 <?php while($row = $result->fetch_assoc()): ?>
                 <tr>
                     <td><?php echo $row['timestamp']; ?></td>
-                    <td><strong><?php echo htmlspecialchars($row['admin_name'] ?? 'System'); ?></strong></td>
-                    <td><span class="badge <?php echo $row['action_type']; ?>"><?php echo $row['action_type']; ?></span></td>
+                    <td><font size="4"><?php echo htmlspecialchars($row['admin_name'] ?? 'System'); ?></font></td>
+                    
+                    <td><font size="3" color="black"><?php echo htmlspecialchars($row['action_type']); ?></font></td>
+                    
                     <td><?php echo htmlspecialchars($row['action']); ?></td>
-                    <td><?php echo htmlspecialchars($row['target_name'] ?? '-'); ?></td>
+                    <td><font size="4"><?php echo htmlspecialchars($row['target_name'] ?? '-'); ?></font></td>
                     <td><small><?php echo $row['ip_address']; ?></small></td>
                 </tr>
                 <?php endwhile; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="6" style="text-align:center;">ยังไม่มีบันทึกข้อมูล</td>
+                    <td colspan="6" align="center">ยังไม่มีบันทึกข้อมูล</td>
                 </tr>
             <?php endif; ?>
         </tbody>

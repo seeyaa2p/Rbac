@@ -1,28 +1,27 @@
 <?php
     session_start();
     require('db_login.php'); 
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv=Content-Type content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Login</title>
 </head>
 <body>
-    <form action="login.php" method="POST">
+    <form action="login.php" method="POST" autocomplete="off">
         <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
             <div style="text-align: center;">
                 <h1>Login</h1>
                 <table border="1" style="margin: 0 auto; border-collapse: collapse;">
                     <tr>
                         <td style="padding: 10px;">Username:</td>
-                        <td style="padding: 10px;"><input type="text" name="username" required></td>
+                        <td style="padding: 10px;"><input type="text" name="username" required autocomplete="off"></td>
                     </tr>
                     <tr>
                         <td style="padding: 10px;">Password:</td>
-                        <td style="padding: 10px;"><input type="password" name="password" required></td>
+                        <td style="padding: 10px;"><input type="password" name="password" required autocomplete="new-password"></td>
                     </tr>
                     <tr>
                         <td colspan="2" style="padding: 10px; text-align: center;"><input type="submit" value="Login"></td>

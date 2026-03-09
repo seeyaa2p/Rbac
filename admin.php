@@ -3,13 +3,37 @@ session_start();
 require_once 'db_connect.php'; 
 
 // 1. ตรวจสอบสิทธิ์ (Security Check)
-// ถ้าไม่ได้ Login ให้เด้งไปหน้า login
 if (!isset($_SESSION['user_id'])) {
     header("location: login.php");
     exit;
 }
 
-// 2. จัดการการอัปเดตสิทธิ์และบันทึก Log
+$current_logged_in_user = $_SESSION['user_id'];
+$current_username = $_SESSION['username'] ?? 'Admin';
+
+// 2. จัดการการลบผู้ใช้งาน  (ส่วนที่เพิ่มเข้ามาใหม่)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
+    $target_delete_id = $_POST['delete_id'];
+    
+    // ป้องกันแอดมินเผลอลบบัญชีของตัวเอง
+    if ($target_delete_id != $current_logged_in_user) {
+        $sql_delete = "DELETE FROM user WHERE user_id = ?";
+        $stmt_delete = $conn->prepare($sql_delete);
+        $stmt_delete->bind_param("i", $target_delete_id); 
+        
+        if ($stmt_delete->execute()) {
+            $action_detail = "ลบผู้ใช้งานรหัส $target_delete_id";
+            
+            // บันทึกประวัติลง audit_logs
+            log_action($conn, $current_logged_in_user, $action_detail, 'DELETE', $target_delete_id, 'success');
+            
+            echo "<script>alert('ลบผู้ใช้งานสำเร็จ!'); window.location.href='admin.php';</script>";
+            exit;
+        }
+    }
+}
+
+// 3. จัดการการอัปเดตสิทธิ์
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     $target_user_id = $_POST['user_id'];
     $new_m_level = $_POST['m_level']; 
@@ -19,21 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     $stmt->bind_param("si", $new_m_level, $target_user_id); 
     
     if ($stmt->execute()) {
-        $current_logged_in_user = $_SESSION['user_id']; 
         $action_detail = "เปลี่ยนสิทธิ์ผู้ใช้รหัส $target_user_id เป็น $new_m_level";
-        
-        // บันทึกประวัติ (ฟังก์ชันอยู่ใน db_connect.php)
-        log_action($conn, $current_logged_in_user, $action_detail, $target_user_id, 'success');
+        log_action($conn, $current_logged_in_user, $action_detail, 'UPDATE', $target_user_id, 'success');
         
         echo "<script>alert('อัปเดตสิทธิ์สำเร็จ!'); window.location.href='admin.php';</script>";
         exit;
     }
 }
 
-// 3. ดึงข้อมูลผู้ใช้ (ยกเว้นตัวเอง)
-$current_logged_in_user = $_SESSION['user_id'];
-$current_username = $_SESSION['username'] ?? 'Admin';
-
+// 4. ดึงข้อมูลผู้ใช้ (ยกเว้นตัวเอง)
 $sql_users = "SELECT user_id, username, name, m_level FROM user WHERE user_id != ?";
 $stmt_users = $conn->prepare($sql_users);
 $stmt_users->bind_param("i", $current_logged_in_user); 
@@ -49,58 +67,74 @@ $roles_options = ['admin', 'user'];
 <head>
     <meta charset="UTF-8">
     <title>ระบบจัดการหลังบ้าน</title>
-    <style>
-        .nav-bar { background: #333; color: white; padding: 15px; margin-bottom: 20px; }
-        .nav-bar a { color: white; text-decoration: none; margin-right: 20px; }
-        .nav-bar a:hover { color: #ffca28; }
-        .logout-btn { color: #ff5252 !important; font-weight: bold; }
-    </style>
 </head>
-<body>
+<body bgcolor="#f8f9fa">
 
-    <div class="nav-bar">
-        <a href="admin.php"> หน้าหลักแอดมิน</a>
-        <a href="view_logs.php"> ดูประวัติการใช้งาน</a>
-        <a href="export_logs.php"> ดาวน์โหลด JSON</a>
-        <a href="logout.php" class="logout-btn" onclick="return confirm('คุณต้องการออกจากระบบใช่หรือไม่?')"> ออกจากระบบ</a>
-    </div>
+    <table border="0" width="100%" bgcolor="#333333" cellpadding="15" cellspacing="0">
+        <tr>
+            <td align="left">
+                <a href="admin.php"><font color="#ffffff">หน้าหลักแอดมิน</font></a> &nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="view_logs.php"><font color="#ffffff">ดูประวัติการใช้งาน</font></a>
+            </td>
+            <td align="right">
+                <a href="logout.php" onclick="return confirm('คุณต้องการออกจากระบบใช่หรือไม่?')">
+                    <b><font color="#ff5252">ออกจากระบบ</font></b>
+                </a>
+            </td>
+        </tr>
+    </table>
 
-    <div style="padding: 0 20px;">
-        <h2>จัดการสิทธิ์ผู้ใช้งาน </h2>
-        <p>สวัสดีคุณ: <strong><?= htmlspecialchars($current_username) ?></strong></p>
+    <br>
 
-        <table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%;">
-            <tr style="background-color: #eee;">
-                <th>รหัส</th>
-                <th>ชื่อผู้ใช้</th>
-                <th>ชื่อ-สกุล</th>
-                <th>สิทธิ์ปัจจุบัน</th>
-                <th>แก้ไขสิทธิ์</th>
-            </tr>
-            
-            <?php foreach ($users as $u): ?>
-            <tr>
-                <td><?= $u['user_id'] ?></td>
-                <td><?= htmlspecialchars($u['username']) ?></td>
-                <td><?= htmlspecialchars($u['name']) ?></td>
-                <td><strong><?= htmlspecialchars($u['m_level']) ?></strong></td>
-                <td>
-                    <form method="POST" style="margin: 0;">
-                        <input type="hidden" name="user_id" value="<?= $u['user_id'] ?>">
-                        <select name="m_level">
-                            <?php foreach ($roles_options as $role): ?>
-                                <option value="<?= $role ?>" <?= ($u['m_level'] == $role) ? 'selected' : '' ?>>
-                                    <?= ucfirst($role) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <button type="submit" name="update_role">บันทึก</button>
-                    </form>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </table>
-    </div>
+    <table border="0" width="95%" align="center">
+        <tr>
+            <td>
+                <h2><font color="#333333">จัดการสิทธิ์และผู้ใช้งาน</font></h2>
+                <h3><p><font color="#333333">สวัสดีคุณ: <b><?= htmlspecialchars($current_username) ?></b></font></p></h3>
+
+                <table border="1" cellpadding="10" cellspacing="0" width="100%" bgcolor="#ffffff">
+                    <tr bgcolor="#eeeeee">
+                        <th width="10%"><font color="#333333">รหัส</font></th>
+                        <th width="12%"><font color="#333333">ชื่อผู้ใช้</font></th>
+                        <th width="15%"><font color="#333333">ชื่อ-สกุล</font></th>
+                        <th width="12%"><font color="#333333">สิทธิ์ปัจจุบัน</font></th>
+                        <th width="15%"><font color="#333333">แก้ไขสิทธิ์</font></th>
+                        <th width="10%"><font color="#333333">จัดการ</font></th> </tr>
+                    
+                    <?php foreach ($users as $u): ?>
+                    <tr>
+                        <td align="center"><font size="4"><?= $u['user_id'] ?></font></td>
+                        <td><font size="4"><?= htmlspecialchars($u['username']) ?></font></td>
+                        <td><font size="4"><?= htmlspecialchars($u['name']) ?></font></td>
+                        <td align="center"><b><font size="4" color="#040404"><?= htmlspecialchars($u['m_level']) ?></font></b></td>
+                        
+                        <td align="center">
+                            <form method="POST">
+                                <input type="hidden" name="user_id" value="<?= $u['user_id'] ?>">
+                                <select name="m_level">
+                                    <?php foreach ($roles_options as $role): ?>
+                                        <option value="<?= $role ?>" <?= ($u['m_level'] == $role) ? 'selected' : '' ?>>
+                                            <?= ucfirst($role) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="submit" name="update_role">บันทึก</button>
+                            </form>
+                        </td>
+                        
+                        <td align="center">
+                            <form method="POST" onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบผู้ใช้งาน <?= htmlspecialchars($u['username']) ?> ?\nข้อมูลที่ถูกลบจะไม่สามารถกู้คืนได้!');">
+                                <input type="hidden" name="delete_id" value="<?= $u['user_id'] ?>">
+                                <button type="submit" name="delete_user"><font color="#dc3545"><b>ลบ</b></font></button>
+                            </form>
+                        </td>
+                        
+                    </tr>
+                    <?php endforeach; ?>
+                </table>
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>
