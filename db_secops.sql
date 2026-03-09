@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 06, 2026 at 09:01 AM
+-- Generation Time: Mar 09, 2026 at 07:38 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -31,8 +31,20 @@ CREATE TABLE `audit_logs` (
   `log_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `action` varchar(255) NOT NULL,
-  `timestamp` datetime DEFAULT current_timestamp()
+  `timestamp` datetime DEFAULT current_timestamp(),
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `target_id` int(11) DEFAULT NULL,
+  `status` varchar(20) DEFAULT 'success',
+  `action_type` enum('CREATE','UPDATE','DELETE','LOGIN') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `audit_logs`
+--
+
+INSERT INTO `audit_logs` (`log_id`, `user_id`, `action`, `timestamp`, `ip_address`, `user_agent`, `target_id`, `status`, `action_type`) VALUES
+(1, 10, 'เปลี่ยนสิทธิ์เป็น user', '2026-03-09 10:51:49', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 2, 'success', 'CREATE');
 
 -- --------------------------------------------------------
 
@@ -97,13 +109,13 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `username`, `password`, `m_level`, `name`, `time`) VALUES
-(1, 'Admin', '$2y$10$WXFz.oOcptTOJwQWikpWbeoDNHY2jm8xccTI6ujHDWAuYyHAy8bA2', '', 'Admin Admin', '2026-02-26 08:09:01'),
-(2, 'lisa', '$2y$10$kZzBu/9pf7sK4rjiEpgVaufSqfIU6Uom5/1xN6JZX2vkAufQKtCde', 'admin', 'Lisa list', '2026-02-26 08:09:01'),
-(3, 'alanw', '$2y$10$CQCz/tkEPRTObHFsmrUHqe4s0rMAnDPyuiPfdQ4WARh3Zx/3T56bq', 'admin', 'Alan Walker', '2026-02-26 08:09:01'),
+(1, 'Admin', '$2y$10$WXFz.oOcptTOJwQWikpWbeoDNHY2jm8xccTI6ujHDWAuYyHAy8bA2', 'admin', 'Admin Admin', '2026-03-09 03:00:48'),
+(2, 'lisa', '$2y$10$kZzBu/9pf7sK4rjiEpgVaufSqfIU6Uom5/1xN6JZX2vkAufQKtCde', 'user', 'Lisa list', '2026-03-09 03:02:26'),
+(3, 'alanw', '$2y$10$CQCz/tkEPRTObHFsmrUHqe4s0rMAnDPyuiPfdQ4WARh3Zx/3T56bq', 'user', 'Alan Walker', '2026-03-09 03:02:22'),
 (4, 'love', '$2y$10$E5yGferHk496klqsbmgMB.AGAC6d8J1zXG2N4Ccc/SUbc0Su.U6vG', 'user', 'Love Love', '2026-02-26 08:09:01'),
 (5, 'lala', '$2y$10$g6EbvIvsG7Sjf0gZSWgBRe5PMwVIz5eZViBcfNBoaOGxFmQadoFyy', 'user', 'lala lulu', '2026-02-26 08:09:01'),
 (7, 'stars', '$2y$10$wOQtTnwB8LEbjgtHXChs3eqRQzkTu0H8WTbb.giGcMj54NVtkxaY2', 'user', 'Stars Moon', '2026-03-02 08:07:43'),
-(8, 'alan', '$2y$10$tFzM/4n8DgaVDEO1g.k/DuEHys7.xPPbTBMD2qiZzd4RKTHXldPX6', 'admin', 'Alan Walker', '2026-03-02 08:08:44'),
+(8, 'alan', '$2y$10$tFzM/4n8DgaVDEO1g.k/DuEHys7.xPPbTBMD2qiZzd4RKTHXldPX6', 'user', 'Alan Walker', '2026-03-09 03:02:15'),
 (9, 'robot', '$2y$10$9MAbRVXMVUzkd5olQG2Y1eY8k2cuJMcPsaKIbIa19kAiN1BRLaO2K', 'user', 'Iam Robot', '2026-03-03 09:24:29'),
 (10, 'test01', '$2y$10$M7z7U78qKuXdTHS5ng7GbOlW0WNP.8jW9H3UvJ8ObkdBv6cXRw9dG', 'admin', 'test 01', '2026-03-03 09:42:56');
 
@@ -159,7 +171,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `permission`
