@@ -71,17 +71,17 @@ $roles_options = ['admin', 'user'];
 <body bgcolor="#f8f9fa">
 
     <table border="0" width="100%" bgcolor="#333333" cellpadding="15" cellspacing="0">
-        <tr>
-            <td align="left">
-                <a href="admin.php"><font color="#ffffff">หน้าหลักแอดมิน</font></a> &nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="view_logs.php"><font color="#ffffff">ดูประวัติการใช้งาน</font></a>
-            </td>
-            <td align="right">
-                <a href="logout.php" onclick="return confirm('คุณต้องการออกจากระบบใช่หรือไม่?')">
-                    <b><font color="#ff5252">ออกจากระบบ</font></b>
-                </a>
-            </td>
-        </tr>
+    <tr>
+        <td align="left" width="33%">
+            <a href="index.php"><font color="#ffffff">Home Page</font></a> &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="view_logs.php"><font color="#ffffff">History Page</font></a>
+        </td>
+        <td align="right" width="33%">
+            <a href="logout.php" onclick="return confirm('คุณต้องการออกจากระบบใช่หรือไม่?')">
+                <b><font color="#ff5252">Logout</font></b>
+            </a>
+        </td>
+    </tr>
     </table>
 
     <br>

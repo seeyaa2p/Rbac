@@ -2,13 +2,20 @@
 session_start();
 require_once 'db_connect.php';
 
-// 1. ตรวจสอบสิทธิ์ (ป้องกันคนนอกแอบมาโหลด)
-if (!isset($_SESSION['user_id'])) {
-    header("location: login.php");
+// 1. ตรวจสอบสิทธิ์ว่าเป็น admin หรือไม่ 
+if (!isset($_SESSION['user_id']) || $_SESSION['role_account'] !== 'admin') {
+    header("location: index.php");
     exit;
 }
 
-// 2. ดึงข้อมูล Log ทั้งหมด
+// 2. ตรวจสอบว่ามาจากการกดปุ่มคำว่า "download_json" จริงๆ ใช่ไหม 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['download_json'])) {
+    // ถ้าไม่ได้กดปุ่มมา (เช่น แอบเอา URL ไปวางบนเบราว์เซอร์) ให้เด้งกลับไปหน้าประวัติ
+    header("location: view_logs.php");
+    exit;
+}
+
+// 3. ดึงข้อมูล Log ทั้งหมด
 $sql = "SELECT a.timestamp, 
                u1.username AS admin_name, 
                a.action_type, 
@@ -22,26 +29,21 @@ $sql = "SELECT a.timestamp,
 
 $result = $conn->query($sql);
 
-// สร้าง Array ว่างๆ เพื่อเตรียมรับข้อมูล
 $logs_array = array();
 
 if ($result && $result->num_rows > 0) {
-    // วนลูปนำข้อมูลแต่ละบรรทัด ยัดใส่เข้าไปใน Array
     while($row = $result->fetch_assoc()) {
         $logs_array[] = $row;
     }
 }
 
-// 3. แปลง Array เป็นรูปแบบ JSON
-// JSON_UNESCAPED_UNICODE ช่วยให้ภาษาไทยไม่กลายเป็นตัวยึกยือ
-// JSON_PRETTY_PRINT ช่วยจัดบรรทัดให้อ่านง่าย
+// 4. แปลง Array เป็นรูปแบบ JSON
 $json_data = json_encode($logs_array, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
-// 4. สั่งให้เบราว์เซอร์ดาวน์โหลดไฟล์
+// 5. สั่งให้เบราว์เซอร์ดาวน์โหลดไฟล์
 header('Content-Type: application/json; charset=utf-8');
 header('Content-Disposition: attachment; filename="audit_logs.json"');
 
-// พิมพ์ข้อมูล JSON ออกมา (ซึ่งจะถูกบันทึกลงในไฟล์ที่โหลด)
 echo $json_data;
 exit();
 ?>

@@ -20,11 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // เรียกใช้ฟังก์ชันบันทึกการ Login
             log_action($conn, $row['user_id'], 'เข้าสู่ระบบสำเร็จ', 'LOGIN');
 
-            if ($row['m_level'] === 'admin') {
-                header("Location: admin.php");
-            } else {
-                header("Location: index.php");
-            }
+            // ส่งทุกคนไปที่หน้า index.php
+            header("Location: index.php");
             exit();
         } else {
             echo "<script>alert('รหัสผ่านไม่ถูกต้อง'); window.history.back();</script>";

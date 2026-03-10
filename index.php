@@ -44,6 +44,10 @@ $result_logs = mysqli_query($conn, $query_logs);
                             <p><font color="#333333">คุณกำลังใช้งานในสิทธิ์: <font color="#007bff"><b><?php echo $user_data['m_level']; ?></b></font></font></p>
                         </td>
                         <td align="right" valign="top">
+                            <?php if ($user_data['m_level'] === 'admin'): ?>
+                                <a href="admin.php"><font color="#28a745" size="4"><b>จัดการระบบ (Admin)</b></font></a> &nbsp;&nbsp;|&nbsp;&nbsp;
+                            <?php endif; ?>
+                            
                             <a href="logout.php"><font color="#dc3545" size="4"><b>ออกจากระบบ</b></font></a>
                         </td>
                     </tr>

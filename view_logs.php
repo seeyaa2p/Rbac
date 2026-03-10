@@ -1,6 +1,13 @@
 <?php
-// 1. เชื่อมต่อฐานข้อมูล
+session_start();
 require_once 'db_connect.php';
+
+// 1. ตรวจสอบว่าล็อกอินหรือยัง และสิทธิ์ต้องเป็น admin เท่านั้น 🛑
+if (!isset($_SESSION['user_id']) || $_SESSION['role_account'] !== 'admin') {
+    // ถ้าไม่ใช่แอดมิน ให้เด้งกลับไปหน้าผู้ใช้งานปกติ
+    header("location: index.php");
+    exit;
+}
 
 // 2. ดึงข้อมูล Log
 $sql = "SELECT a.*, 
@@ -31,7 +38,11 @@ if (!$result) {
     <table border="0" width="90%">
         <tr>
             <td align="left">
-                <a href="admin.php"><button><h3>ย้อนกลับไปหน้าหลักแอดมิน</h3></button></a>
+                <a href="admin.php"><button type="button"><h3>Back</h3></button></a>
+                
+                <form action="export_logs.php" method="POST" style="display:inline;">
+                    <button type="submit" name="download_json"><h3>Download (JSON)</h3></button>
+                </form>
             </td>
         </tr>
     </table>
@@ -54,9 +65,7 @@ if (!$result) {
                 <tr>
                     <td><?php echo $row['timestamp']; ?></td>
                     <td><font size="4"><?php echo htmlspecialchars($row['admin_name'] ?? 'System'); ?></font></td>
-                    
                     <td><font size="3" color="black"><?php echo htmlspecialchars($row['action_type']); ?></font></td>
-                    
                     <td><?php echo htmlspecialchars($row['action']); ?></td>
                     <td><font size="4"><?php echo htmlspecialchars($row['target_name'] ?? '-'); ?></font></td>
                     <td><small><?php echo $row['ip_address']; ?></small></td>
