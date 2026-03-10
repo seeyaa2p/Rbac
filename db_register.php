@@ -28,7 +28,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             // ส่งค่าทั้ง 4 ตัวแปร (รวมถึง $m_level ที่ตั้งเป็น 'user') ลงฐานข้อมูล
             $stmt->bind_param("ssss", $username, $hashedPassword, $name, $m_level);
+            
             if ($stmt->execute()) {
+                //  ดึง ID ของผู้ใช้งานที่เพิ่งสร้างเสร็จเมื่อกี้
+                $new_user_id = $conn->insert_id;
+                
+                //  กำหนดข้อความรายละเอียด
+                $action_detail = "สมัครสมาชิกใหม่ชื่อ: " . $username;
+                
+                //  เรียกใช้ฟังก์ชันบันทึก Log 
+                // กำหนด user_id เป็นของคนสมัครเอง, action_type เป็น 'CREATE' และส่งชื่อไปเก็บใน target_name
+                log_action($conn, $new_user_id, $action_detail, 'CREATE', null, $username, 'success');
+
                 echo "<script>alert('สมัครสมาชิกเรียบร้อยแล้ว!'); window.location.href='login.php';</script>";
             } else {
                 echo "<script>alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล'); window.history.back();</script>";

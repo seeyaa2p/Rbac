@@ -11,16 +11,18 @@
     } 
 
     // ปรับให้รับค่า $action_type เพื่อลงตารางได้ตรงช่อง
-    function log_action($conn, $user_id, $action, $action_type, $target_id = null, $status = 'success') {
-        $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
-        $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
-        
-        $sql = "INSERT INTO audit_logs (user_id, action, action_type, target_id, ip_address, user_agent, status) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
-        
-        $stmt = $conn->prepare($sql);
-        // "issssss" คือประเภทข้อมูล: int, string, string, string, string, string, string
-        $stmt->bind_param("issssss", $user_id, $action, $action_type, $target_id, $ip_address, $user_agent, $status);
-        $stmt->execute();
-    }
+    function log_action($conn, $user_id, $action, $action_type, $target_id = null, $target_name = null, $status = 'success') {
+    $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
+    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+    
+    //  เพิ่ม target_name ลงไปในคำสั่ง INSERT
+    $sql = "INSERT INTO audit_logs (user_id, action, action_type, target_id, target_name, ip_address, user_agent, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    $stmt = $conn->prepare($sql);
+    //  "isssssss" มี s เพิ่มมา 1 ตัวเพื่อรับค่าชื่อที่เป็น String
+    $stmt->bind_param("isssssss", $user_id, $action, $action_type, $target_id, $target_name, $ip_address, $user_agent, $status);
+    $stmt->execute();
+}
+
 ?>

@@ -3,29 +3,45 @@ session_start();
 require_once 'db_connect.php'; 
 
 // 1. ตรวจสอบสิทธิ์ (Security Check)
-if (!isset($_SESSION['user_id'])) {
-    header("location: login.php");
+if (!isset($_SESSION['user_id']) || $_SESSION['role_account'] !== 'admin') {
+    header("location: index.php");
     exit;
 }
 
 $current_logged_in_user = $_SESSION['user_id'];
 $current_username = $_SESSION['username'] ?? 'Admin';
 
-// 2. จัดการการลบผู้ใช้งาน  (ส่วนที่เพิ่มเข้ามาใหม่)
+// 2. จัดการการลบผู้ใช้งาน
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     $target_delete_id = $_POST['delete_id'];
     
     // ป้องกันแอดมินเผลอลบบัญชีของตัวเอง
     if ($target_delete_id != $current_logged_in_user) {
+        
+        //  ดึงชื่อมาก่อนทำการลบ
+        $sql_get_name = "SELECT username FROM user WHERE user_id = ?";
+        $stmt_name = $conn->prepare($sql_get_name);
+        $stmt_name->bind_param("i", $target_delete_id);
+        $stmt_name->execute();
+        $result_name = $stmt_name->get_result();
+        
+        $target_username = "-";
+        if ($row = $result_name->fetch_assoc()) {
+            $target_username = $row['username'];
+        }
+        $stmt_name->close();
+
+        // ทำการลบ
         $sql_delete = "DELETE FROM user WHERE user_id = ?";
         $stmt_delete = $conn->prepare($sql_delete);
         $stmt_delete->bind_param("i", $target_delete_id); 
         
         if ($stmt_delete->execute()) {
-            $action_detail = "ลบผู้ใช้งานรหัส $target_delete_id";
+            //  เปลี่ยนข้อความให้แสดงเป็นชื่อ
+            $action_detail = "ลบผู้ใช้งานชื่อ: " . $target_username;
             
-            // บันทึกประวัติลง audit_logs
-            log_action($conn, $current_logged_in_user, $action_detail, 'DELETE', $target_delete_id, 'success');
+            //  บันทึกลง Log แค่ 1 บรรทัดเท่านั้น (ลบตัวที่เบิ้ลออกไปแล้ว)
+            log_action($conn, $current_logged_in_user, $action_detail, 'DELETE', null, $target_username, 'success');
             
             echo "<script>alert('ลบผู้ใช้งานสำเร็จ!'); window.location.href='admin.php';</script>";
             exit;
@@ -38,13 +54,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     $target_user_id = $_POST['user_id'];
     $new_m_level = $_POST['m_level']; 
     
+    //  ดึงชื่อมาก่อนเช่นกัน เพื่อให้โชว์ชื่อตอนเปลี่ยนสิทธิ์
+    $sql_get_name = "SELECT username FROM user WHERE user_id = ?";
+    $stmt_name = $conn->prepare($sql_get_name);
+    $stmt_name->bind_param("i", $target_user_id);
+    $stmt_name->execute();
+    $result_name = $stmt_name->get_result();
+    
+    $target_username = "-";
+    if ($row = $result_name->fetch_assoc()) {
+        $target_username = $row['username'];
+    }
+    $stmt_name->close();
+
     $sql = "UPDATE user SET m_level = ? WHERE user_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("si", $new_m_level, $target_user_id); 
     
     if ($stmt->execute()) {
-        $action_detail = "เปลี่ยนสิทธิ์ผู้ใช้รหัส $target_user_id เป็น $new_m_level";
-        log_action($conn, $current_logged_in_user, $action_detail, 'UPDATE', $target_user_id, 'success');
+        //  เปลี่ยนข้อความให้แสดงเป็นชื่อ
+        $action_detail = "เปลี่ยนสิทธิ์ผู้ใช้ชื่อ $target_username เป็น $new_m_level";
+        log_action($conn, $current_logged_in_user, $action_detail, 'UPDATE', $target_user_id, $target_username, 'success');
         
         echo "<script>alert('อัปเดตสิทธิ์สำเร็จ!'); window.location.href='admin.php';</script>";
         exit;
