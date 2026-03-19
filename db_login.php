@@ -21,12 +21,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             log_action($conn, $row['user_id'], 'เข้าสู่ระบบสำเร็จ', 'LOGIN');
 
             // ส่งทุกคนไปที่หน้า index.php
+            http_response_code(200);
             header("Location: index.php");
             exit();
         } else {
+            http_response_code(401);
             echo "<script>alert('รหัสผ่านไม่ถูกต้อง'); window.history.back();</script>";
         }
     } else {
+        http_response_code(401);
         echo "<script>alert('ไม่พบชื่อผู้ใช้นี้'); window.history.back();</script>";
     }
 }
