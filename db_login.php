@@ -25,11 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             header("Location: index.php");
             exit();
         } else {
-            http_response_code(403);
+            http_response_code(401);
             echo "<script>alert('รหัสผ่านไม่ถูกต้อง'); window.history.back();</script>";
         }
     } else {
-        http_response_code(401);
+        http_response_code(400);
         echo "<script>alert('ไม่พบชื่อผู้ใช้นี้'); window.history.back();</script>";
     }
 }
