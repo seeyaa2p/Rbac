@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "<script>alert('รหัสผ่านไม่ถูกต้อง'); window.history.back();</script>";
         }
     } else {
-        http_response_code(400);
+        http_response_code(404);
         echo "<script>alert('ไม่พบชื่อผู้ใช้นี้'); window.history.back();</script>";
     }
 }
