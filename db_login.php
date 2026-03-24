@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             header("Location: index.php");
             exit();
         } else {
-            http_response_code(401);
+            http_response_code(403);
             echo "<script>alert('รหัสผ่านไม่ถูกต้อง'); window.history.back();</script>";
         }
     } else {
