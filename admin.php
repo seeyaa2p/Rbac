@@ -4,6 +4,7 @@ require_once 'db_connect.php';
 
 // 1. ตรวจสอบสิทธิ์ (Security Check)
 if (!isset($_SESSION['user_id']) || $_SESSION['role_account'] !== 'admin') {
+    http_response_code(403);
     header("location: index.php");
     exit;
 }
@@ -42,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
             
             //  บันทึกลง Log แค่ 1 บรรทัดเท่านั้น (ลบตัวที่เบิ้ลออกไปแล้ว)
             log_action($conn, $current_logged_in_user, $action_detail, 'DELETE', null, $target_username, 'success');
-            
+            http_response_code(204);
             echo "<script>alert('ลบผู้ใช้งานสำเร็จ!'); window.location.href='admin.php';</script>";
             exit;
         }
@@ -75,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
         //  เปลี่ยนข้อความให้แสดงเป็นชื่อ
         $action_detail = "เปลี่ยนสิทธิ์ผู้ใช้ชื่อ $target_username เป็น $new_m_level";
         log_action($conn, $current_logged_in_user, $action_detail, 'UPDATE', $target_user_id, $target_username, 'success');
-        
+        http_response_code(401);
         echo "<script>alert('อัปเดตสิทธิ์สำเร็จ!'); window.location.href='admin.php';</script>";
         exit;
     }

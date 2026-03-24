@@ -5,6 +5,7 @@ require_once 'db_connect.php';
 // 1. ตรวจสอบสิทธิ์ว่าเป็น admin หรือไม่ 
 if (!isset($_SESSION['user_id']) || $_SESSION['role_account'] !== 'admin') {
     header("location: index.php");
+    http_response_code(401);
     exit;
 }
 
