@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 // 2. ดึงรหัสผู้ใช้งานปัจจุบันจาก Session
 $current_user_id = $_SESSION['user_id'];
 
-// 3. ค้นหาข้อมูลของผู้ใช้งานคนนี้จากฐานข้อมูล 🕵️‍♂️
+// 3. ค้นหาข้อมูลของผู้ใช้งานคนนี้จากฐานข้อมูล 
 $sql = "SELECT user_id, username, name, m_level FROM user WHERE user_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $current_user_id);
