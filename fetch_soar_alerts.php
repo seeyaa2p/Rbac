@@ -4,7 +4,7 @@ require_once 'db_connect.php';
 // SOAR Cloud config (เอาจาก URL ที่ใช้เปิด SOAR UI)
 $soar_host = "https://d7pv5.siemplify-soar.com/v1alpha/projects/582001996409/locations/asia-southeast1/instances/204c70d8-15c8-42b2-a53b-e7a9c952ce33/webhooks/6d00c1d6-a134-4eb7-9350-07e6088f0f92/6d00c1d6-a134-4eb7-9350-07e6088f0f92:ingest?apiKey=**************************
 ";
-$api_key   = "************";  // เอาจาก Settings → API Key
+$api_key   = "YOUR_ACTUAL_SOAR_API_KEY";  // เอาจาก Settings → API Key
 
 // ดึง Cases
 $ch = curl_init("$soar_host/api/external/v1/cases/GetCasesByFilter");
