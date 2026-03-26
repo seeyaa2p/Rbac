@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once 'db_connect.php';
 
 // SOAR Cloud config (เอาจาก URL ที่ใช้เปิด SOAR UI)
@@ -17,7 +21,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "AppKey: $api_key",
+    "AppKey: " . $api_key,
     "Content-Type: application/json",
 ]);
 $response = curl_exec($ch);
@@ -25,7 +29,7 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($httpCode !== 200) {
-    die("❌ SOAR API Error $httpCode: $response");
+    die(" SOAR API Error $httpCode: $response");
 }
 
 $data     = json_decode($response, true);

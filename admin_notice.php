@@ -4,8 +4,8 @@ require_once 'db_connect.php';
 
 // ฟังก์ชันส่ง Webhook ไป SecOps
 function sendSecOpsWebhook($event, $data) {
-    $webhook_url = "https://d7pv5.siemplify-soar.com/v1alpha/projects/582001996409/locations/asia-southeast1/instances/204c70d8-15c8-42b2-a53b-e7a9c952ce33/webhooks/6d00c1d6-a134-4eb7-9350-07e6088f0f92:ingest?apiKey=00924396-e904-4c4a-a288-1265d2815858";
-    
+    $webhook_url = "https://d7pv5.siemplify-soar.com/v1alpha/projects/582001996409/locations/asia-southeast1/instances/204c70d8-15c8-42b2-a53b-e7a9c952ce33/webhooks/6d00c1d6-a134-4eb7-9350-07e6088f0f92/6d00c1d6-a134-4eb7-9350-07e6088f0f92:ingest?apiKey=**************************"; // เอาจาก URL ที่ใช้เปิด SOAR UI
+
     $payload = [
         "event"     => $event,
         "timestamp" => date('Y-m-d H:i:s'),
