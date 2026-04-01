@@ -35,10 +35,9 @@ $stmt->close();
         <tr>
             <td align="left" width="50%">
                 <font color="#ffffff"><b>Rbac</b></font>
-                
+                &nbsp;&nbsp;&nbsp;&nbsp;
                 <?php if ($_SESSION['role_account'] === 'admin'): ?>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="admin.php"><font color="#ffffff"><b>Admin Page</b></font></a>
+                    <a href="admin.php"><font color="#ffffff"><b>Admin Page</b></font></a> 
                 <?php endif; ?>
             </td>
             

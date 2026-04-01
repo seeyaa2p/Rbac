@@ -104,8 +104,11 @@ $roles_options = ['admin', 'user'];
     <table border="0" width="100%" bgcolor="#333333" cellpadding="15" cellspacing="0">
     <tr>
         <td align="left" width="33%">
+            <font color="#ffffff"><b>Rbac</b></font>
+            &nbsp;&nbsp;&nbsp;&nbsp;
             <a href="index.php"><font color="#ffffff">Home Page</font></a> &nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="view_logs.php"><font color="#ffffff">History Page</font></a>
+            <a href="view_logs.php"><font color="#ffffff">History Page</font></a> &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="secops_alerts.php"><font color="#ffffff">SecOps Alerts</font></a>
         </td>
         <td align="right" width="33%">
             <a href="logout.php" onclick="return confirm('คุณต้องการออกจากระบบใช่หรือไม่?')">
@@ -120,7 +123,7 @@ $roles_options = ['admin', 'user'];
     <table border="0" width="95%" align="center">
         <tr>
             <td>
-                <h2><font color="#333333">จัดการสิทธิ์และผู้ใช้งาน</font></h2>
+                <h2><font color="#333333">Admin Page</font></h2>
                 <h3><p><font color="#333333">สวัสดีคุณ: <b><?= htmlspecialchars($current_username) ?></b></font></p></h3>
 
                 <table border="1" cellpadding="10" cellspacing="0" width="100%" bgcolor="#ffffff">

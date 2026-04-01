@@ -7,10 +7,6 @@ define('WH_SECRET', $env['WEBHOOK_SECRET'] ?? '');
 
 require_once 'db_connect.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role_account'] !== 'admin') {
-    header("location: index.php");
-    exit;
-}
 
 $received = $_SERVER['HTTP_X_WEBHOOK_SECRET'] ?? '';
 if ($received !== WH_SECRET) {
