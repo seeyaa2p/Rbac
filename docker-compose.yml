@@ -1,0 +1,13 @@
+services:
+  google-secops-agent:
+    image: us-docker.pkg.dev/siem-ar-public/images/agent:latest
+    container_name: secops-agent
+    restart: always
+    # สำคัญ: เพื่อให้ Docker คุยกับ MySQL ใน XAMPP ได้
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./config.yaml:/etc/opt/chronicle/config.yaml
+      - ./auth_key.json:/etc/opt/chronicle/auth_key.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/etc/opt/chronicle/auth_key.json
