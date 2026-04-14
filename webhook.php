@@ -177,6 +177,25 @@ switch ($action) {
         $duration = (int)($p['duration_minutes'] ?? 15);
         $status   = $p['status'] ?? 'temporary_locked';
 
+        // ถ้าไม่ได้ส่ง username มาจาก playbook ให้ดึง username ล่าสุดจาก audit_logs
+        if ($username === '') {
+            $stmt = $conn->prepare("
+                SELECT target_name
+                FROM `audit_logs`
+                WHERE target_name IS NOT NULL
+                AND target_name <> ''
+                AND status = 'failed'
+                ORDER BY log_id DESC
+                LIMIT 1
+            ");
+            $stmt->execute();
+            $latest = $stmt->get_result()->fetch_assoc();
+
+            if ($latest && !empty($latest['target_name'])) {
+                $username = trim($latest['target_name']);
+            }
+        }
+
         if ($username === '') {
             $result = ['status' => 'error', 'message' => 'username is required'];
             break;
@@ -209,7 +228,7 @@ switch ($action) {
         $stmt->bind_param("ssss", $status, $locked_until, $reason, $username);
         $stmt->execute();
 
-        // บันทึก audit log
+        // บันทึก audit log ว่าระบบ SecOps ล็อก user แล้ว
         $stmt = $conn->prepare("
             INSERT INTO `audit_logs`
                 (user_id, action, action_type, ip_address, target_name, status, source)
