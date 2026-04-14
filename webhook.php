@@ -112,6 +112,46 @@ switch ($action) {
         $result = ['status' => 'success', 'log_id' => $conn->insert_id];
         break;
 
+    case 'temporary_lock_user':
+        $username = $p['username'] ?? '';
+        $reason   = $p['reason'] ?? 'security_lock';
+        $duration = (int)($p['duration_minutes'] ?? 15);
+
+        if (!$username) {
+            $result = ['status' => 'error', 'message' => 'username is required'];
+            break;
+        }
+
+        // คำนวณเวลาปลดล็อก
+        $locked_until = date('Y-m-d H:i:s', time() + ($duration * 60));
+
+        // อัปเดต user
+        $stmt = $conn->prepare("UPDATE `user` SET status = 'temporary_locked', locked_until = ? WHERE username = ?");
+        $stmt->bind_param("ss", $locked_until, $username);
+        $stmt->execute();
+
+        // log ลง audit_logs
+        $stmt = $conn->prepare("INSERT INTO `audit_logs`
+            (user_id, action, action_type, ip_address, target_name, status, source)
+            VALUES (
+                (SELECT user_id FROM user WHERE username = ?),
+                'User temporarily locked',
+                'SECURITY',
+                'secops-agent',
+                ?,
+                'success',
+                'secops'
+            )");
+        $stmt->bind_param("ss", $username, $username);
+        $stmt->execute();
+
+        $result = [
+            'status' => 'success',
+            'username' => $username,
+            'locked_until' => $locked_until
+        ];
+        break;
+
     default:
         http_response_code(400);
         $result = ['status' => 'unknown_action', 'action' => $action];
