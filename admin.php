@@ -104,8 +104,6 @@ $roles_options = ['admin', 'user'];
     <table border="0" width="100%" bgcolor="#333333" cellpadding="15" cellspacing="0">
     <tr>
         <td align="left" width="33%">
-            <font color="#ffffff"><b>Rbac</b></font>
-            &nbsp;&nbsp;&nbsp;&nbsp;
             <a href="index.php"><font color="#ffffff">Home Page</font></a> &nbsp;&nbsp;&nbsp;&nbsp;
             <a href="view_logs.php"><font color="#ffffff">History Page</font></a> &nbsp;&nbsp;&nbsp;&nbsp;
             <a href="secops_alerts.php"><font color="#ffffff">SecOps Alerts</font></a>
